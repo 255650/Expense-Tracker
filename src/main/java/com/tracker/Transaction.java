@@ -2,14 +2,14 @@ package com.tracker;
 
 import java.time.LocalDate;
 
-public class Expense {
+public class Transaction {
 
     private final double amount;
     private final String category;
     private final LocalDate date;
     private final String description;
 
-    public Expense(double amount, String category, LocalDate date, String description) {
+    public Transaction(double amount, String category, LocalDate date, String description) {
         if (amount < 0) throw new IllegalArgumentException("Amount cannot be negative");
         if (category == null) throw new IllegalArgumentException("Category cannot be null");
         if (date == null) throw new IllegalArgumentException("Date cannot be null");

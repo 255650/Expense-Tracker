@@ -5,11 +5,11 @@ import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class ExpenseTest {
+class TransactionTest {
 
     @Test
     void shouldCreateExpenseWithGivenFields() {
-        Expense e = new Expense(
+        Transaction e = new Transaction(
                 100.0,
                 "Food",
                 LocalDate.of(2024, 1, 1),
@@ -26,21 +26,21 @@ class ExpenseTest {
     @Test
     void shouldThrowExceptionWhenAmountIsNegative() {
         assertThrows(IllegalArgumentException.class, () ->
-                new Expense(-10, "Food", LocalDate.now(), "Invalid")
+                new Transaction(-10, "Food", LocalDate.now(), "Invalid")
         );
     }
 
     @Test
     void shouldThrowExceptionWhenCategoryIsNull() {
         assertThrows(IllegalArgumentException.class, () ->
-                new Expense(20, null, LocalDate.now(), "No category")
+                new Transaction(20, null, LocalDate.now(), "No category")
         );
     }
 
     @Test
     void shouldThrowExceptionWhenDateIsNull() {
         assertThrows(IllegalArgumentException.class, () ->
-                new Expense(20, "Food", null, "No date")
+                new Transaction(20, "Food", null, "No date")
         );
     }
 }
