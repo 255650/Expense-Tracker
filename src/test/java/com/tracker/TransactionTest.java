@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class TransactionTest {
 
     @Test
-    void shouldCreateExpenseWithGivenFields() {
+    void shouldCreateTransactionWithGivenFields() {
         Transaction e = new Transaction(
                 100.0,
                 "Food",
