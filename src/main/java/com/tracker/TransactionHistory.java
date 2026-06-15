@@ -13,6 +13,10 @@ public class TransactionHistory
         }
         transactions.add(transaction);
     }
+    public boolean removeTransaction(Transaction transaction)
+    {
+        return transactions.remove(transaction);
+    }
     public List<Transaction> getTransactions()
     {
         return new ArrayList<>(transactions);
