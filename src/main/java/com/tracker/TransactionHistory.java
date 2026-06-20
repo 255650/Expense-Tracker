@@ -2,7 +2,7 @@ package com.tracker;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.Comparator;
 public class TransactionHistory
 {
     private final List<Transaction> transactions = new ArrayList<>();
@@ -17,6 +17,9 @@ public class TransactionHistory
     public boolean removeTransaction(Transaction transaction)
     {
         return transactions.remove(transaction);
+    }
+    public List<Transaction> getHistory() {
+        return transactions.stream().sorted(Comparator.comparing(Transaction::getDate, Comparator.reverseOrder())).toList();
     }
     public List<Transaction> getTransactions()
     {

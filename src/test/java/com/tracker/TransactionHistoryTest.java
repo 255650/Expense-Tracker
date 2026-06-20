@@ -108,4 +108,41 @@ class TransactionHistoryTest
         List<Transaction> result = history.getTransactions("Electronics", null, null);
         assertTrue(result.isEmpty());
     }
+    @Test
+    void shouldReturnHistorySortedByDateDescending() {
+        TransactionHistory history = new TransactionHistory();
+
+        Transaction transaction = new Transaction(
+                100.0,
+                "Food",
+                LocalDate.now(),
+                "Lunch"
+        );
+
+        Transaction transaction2 = new Transaction(
+                200.0,
+                "Toys",
+                LocalDate.now().plusDays(1),
+                "Ball"
+        );
+
+        Transaction transaction3 = new Transaction(
+                150.0,
+                "Food",
+                LocalDate.now().minusDays(1),
+                "Lunch"
+        );
+
+        history.addTransaction(transaction);
+        history.addTransaction(transaction2);
+        history.addTransaction(transaction3);
+
+        List<Transaction> result = history.getHistory();
+
+        assertEquals(3, result.size());
+
+        assertEquals(transaction2, result.get(0));
+        assertEquals(transaction, result.get(1));
+        assertEquals(transaction3, result.get(2));
+    }
 }
