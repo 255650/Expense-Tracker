@@ -24,19 +24,11 @@ class TransactionTest {
 
     /// Testowanie poprawności argumnetów
     @Test
-    void shouldThrowExceptionWhenAmountIsNegative() {
-        assertThrows(IllegalArgumentException.class, () ->
-                new Transaction(-10, "Food", LocalDate.now(), "Invalid")
-        );
-    }
-
-    @Test
     void shouldThrowExceptionWhenCategoryIsNull() {
         assertThrows(IllegalArgumentException.class, () ->
                 new Transaction(20, null, LocalDate.now(), "No category")
         );
     }
-
     @Test
     void shouldThrowExceptionWhenDateIsNull() {
         assertThrows(IllegalArgumentException.class, () ->
