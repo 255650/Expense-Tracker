@@ -25,6 +25,9 @@ public class Budget {
         this.balance -= transaction.getAmount();
         this.transactionHistory.removeTransaction(transaction);
     }
+    public boolean editTransaction(Transaction transaction, double newAmount, String newCategory, LocalDate newDate, String newDescription) {
+        if (!transactionHistory.getTransactions().contains(transaction)) return false;
+        double oldAmount = transaction.getAmount();
 
     public String getCategory() {
         return this.category;

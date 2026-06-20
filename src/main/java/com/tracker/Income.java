@@ -8,4 +8,10 @@ public class Income extends Transaction {
                   String description) {
         super(amount, category, date, description);
     }
+    @Override
+    public void setAmount(double amount) {
+        if (amount < 0) throw new IllegalArgumentException("Income cannot be negative");
+        super.setAmount(amount);
+    }
+
 }
