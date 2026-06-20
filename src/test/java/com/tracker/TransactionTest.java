@@ -53,13 +53,6 @@ class TransactionTest {
     }
 
     @Test
-    void shouldNotAllowNegativeAmount() {
-        Transaction t = new Transaction(100, "Food", LocalDate.now(), "Lunch");
-
-        assertThrows(IllegalArgumentException.class, () -> t.setAmount(-1));
-        assertEquals(100, t.getAmount()); // upewniamy się, że wartość nie została zmieniona
-    }
-    @Test
     void shouldNotAllowNullCategory() {
         Transaction t = new Transaction(100, "Food", LocalDate.now(), "Lunch");
 

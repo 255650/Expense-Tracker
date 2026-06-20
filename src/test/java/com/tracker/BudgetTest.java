@@ -51,4 +51,112 @@ class BudgetTest {
         assertDoesNotThrow(() -> budget.addTransaction(null));
         assertEquals(1000.0, budget.getBalance(), "Balans nie powinien się zmienić, jeśli transakcja to null");
     }
+
+    /// Testy edycji transakcji
+    @Test
+    void shouldEditTransactionInsideBudget() {
+        Budget food = new Budget("Food", 0);
+        Transaction t = new Expense(100, "Food", LocalDate.of(2024, 1, 1), "Lunch");
+
+        food.addTransaction(t);
+
+        boolean result = food.editTransaction(
+                t,
+                150,
+                "Food",
+                LocalDate.of(2024, 2, 1),
+                "Dinner"
+        );
+
+        assertTrue(result);
+        assertEquals(-150, t.getAmount());
+        assertEquals("Food", t.getCategory());
+        assertEquals(LocalDate.of(2024, 2, 1), t.getDate());
+        assertEquals("Dinner", t.getDescription());
+    }
+    @Test
+    void shouldUpdateBudgetBalanceAfterEditingTransaction() {
+        Budget food = new Budget("Food", 0);
+        Transaction t = new Expense(100, "Food", LocalDate.now(), "Lunch");
+
+        food.addTransaction(t);
+
+        food.editTransaction(
+                t,
+                200,
+                "Food",
+                LocalDate.now(),
+                "Dinner"
+        );
+
+        assertEquals(-200, food.getBalance());
+    }
+    @Test
+    void shouldReturnFalseWhenEditingTransactionNotInBudget() {
+        Budget food = new Budget("Food", 0);
+        Transaction t = new Expense(50, "Food", LocalDate.now(), "Snack");
+
+        boolean result = food.editTransaction(
+                t,
+                100,
+                "Food",
+                LocalDate.now(),
+                "Dinner"
+        );
+
+        assertFalse(result);
+    }
+    @Test
+    void shouldUpdateBalanceCorrectlyForIncomeEdit() {
+        Budget salary = new Budget("Salary", 0);
+        Transaction t = new Income(1000, "Salary", LocalDate.now(), "January");
+
+        salary.addTransaction(t); // balance = 1000
+
+        salary.editTransaction(
+                t,
+                1500,
+                "Salary",
+                LocalDate.now(),
+                "Updated"
+        );
+
+        assertEquals(1500, salary.getBalance());
+    }
+    @Test
+    void shouldUpdateBalanceCorrectlyForExpenseEdit() {
+        Budget food = new Budget("Food", 0);
+        Transaction t = new Expense(80, "Food", LocalDate.now(), "Groceries");
+
+        food.addTransaction(t); // balance = -80
+
+        food.editTransaction(
+                t,
+                120,
+                "Food",
+                LocalDate.now(),
+                "More groceries"
+        );
+
+        assertEquals(-120, food.getBalance());
+    }
+    @Test
+    void shouldEditDescriptionWithoutChangingBalance() {
+        Budget food = new Budget("Food", 0);
+        Transaction t = new Expense(50, "Food", LocalDate.now(), "Old desc");
+
+        food.addTransaction(t); // balance = -50
+
+        food.editTransaction(
+                t,
+                50,
+                "Food",
+                LocalDate.now(),
+                "New desc"
+        );
+
+        assertEquals(-50, food.getBalance());
+        assertEquals("New desc", t.getDescription());
+    }
+
 }
