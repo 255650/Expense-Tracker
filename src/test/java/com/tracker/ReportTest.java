@@ -49,4 +49,9 @@ class ReportTest
     {
         assertTrue(report.isBudgetExceeded(history, budget));
     }
+    @Test
+    void shouldFindMaxExpense()
+    {
+        assertEquals(300, report.maxExpense(history));
+    }
 }

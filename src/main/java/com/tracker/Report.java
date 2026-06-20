@@ -22,4 +22,8 @@ public class Report
     {
         return totalExpenses(history) > budget.getLimit();
     }
+    public double maxExpense(TransactionHistory history)
+    {
+        return history.getTransactions().stream().filter(t -> t instanceof Expense).mapToDouble(Transaction::getAmount).max().orElse(0.0);
+    }
 }
