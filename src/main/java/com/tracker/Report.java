@@ -10,7 +10,7 @@ public class Report
     }
     public double totalExpenses(TransactionHistory history)
     {
-        return history.getTransactions().stream().filter(t -> t instanceof Expense).mapToDouble(Transaction::getAmount).sum();
+        return history.getTransactions().stream().filter(t -> t instanceof Expense).mapToDouble(t -> Math.abs(t.getAmount())).sum();
     }
     public double balance(TransactionHistory history)
     {
@@ -18,19 +18,19 @@ public class Report
     }
     public double expensesByCategory(TransactionHistory history, String category)
     {
-        return history.getTransactions().stream().filter(t -> t instanceof Expense).filter(t -> t.getCategory().equalsIgnoreCase(category)).mapToDouble(Transaction::getAmount).sum();
+        return history.getTransactions().stream().filter(t -> t instanceof Expense).filter(t -> t.getCategory().equalsIgnoreCase(category)).mapToDouble(t -> Math.abs(t.getAmount())).sum();
     }
     public double maxExpense(TransactionHistory history)
     {
-        return history.getTransactions().stream().filter(t -> t instanceof Expense).mapToDouble(Transaction::getAmount).max().orElse(0.0);
+        return history.getTransactions().stream().filter(t -> t instanceof Expense).mapToDouble(t -> Math.abs(t.getAmount())).max().orElse(0.0);
     }
     public double minExpense(TransactionHistory history)
     {
-        return history.getTransactions().stream().filter(t -> t instanceof Expense).mapToDouble(Transaction::getAmount).min().orElse(0.0);
+        return history.getTransactions().stream().filter(t -> t instanceof Expense).mapToDouble(t -> Math.abs(t.getAmount())).min().orElse(0.0);
     }
     public double avgExpense(TransactionHistory history)
     {
-        return history.getTransactions().stream().filter(t -> t instanceof Expense).mapToDouble(Transaction::getAmount).average().orElse(0.0);
+        return history.getTransactions().stream().filter(t -> t instanceof Expense).mapToDouble(t -> Math.abs(t.getAmount())).average().orElse(0.0);
     }
     public double expensesInPeriod(TransactionHistory history, LocalDate start, LocalDate end)
     {
@@ -38,7 +38,7 @@ public class Report
                 .filter(t -> t instanceof Expense)
                 .filter(t -> !t.getDate().isBefore(start))
                 .filter(t -> !t.getDate().isAfter(end))
-                .mapToDouble(Transaction::getAmount)
+                .mapToDouble(t -> Math.abs(t.getAmount()))
                 .sum();
     }
 }
