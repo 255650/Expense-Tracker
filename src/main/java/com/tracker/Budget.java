@@ -13,15 +13,19 @@ public class Budget {
         this.transactionHistory = new TransactionHistory();
     }
 
-    public double getBalance() {return this.balance;}
-    public String getCategory() {return this.category;}
-    public double getResources() {return this.balance;}
+    public double getBalance() {
+        return this.balance;
+    }
 
     public void addTransaction(Transaction transaction) {
         if (transaction != null) {
             this.balance += transaction.getAmount();
             this.transactionHistory.addTransaction(transaction);
         }
+    }public void removeTransaction(Transaction transaction) {
+        if (transaction == null) return;
+        this.balance -= transaction.getAmount();
+        this.transactionHistory.removeTransaction(transaction);
     }
     public boolean editTransaction(Transaction transaction, double newAmount, String newCategory, LocalDate newDate, String newDescription) {
         if (!transactionHistory.getTransactions().contains(transaction)) return false;
@@ -38,4 +42,13 @@ public class Budget {
         return true;
     }
 
+    public String getCategory() {
+        return this.category;
+    }
+
+    public double getResources() {
+        return this.balance;
+    }
+
+    public TransactionHistory getTransactionHistory(){return transactionHistory;}
 }
