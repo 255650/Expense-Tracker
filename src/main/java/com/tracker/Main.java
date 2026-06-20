@@ -8,13 +8,11 @@ import java.util.Scanner;
 public class Main {
 
     public static void main(String[] args) {
-
         ExpenseTracker tracker = new ExpenseTracker();
-        Budget currentBudget = null;
+        Budget currentBudget;
         Scanner scanner = new Scanner(System.in);
 
         while (true) {
-
             System.out.println("""
                     \n=== MENU BUDŻETÓW ===
                     1. Dodaj budżet
@@ -31,7 +29,7 @@ public class Main {
                 case 3 -> {
                     currentBudget = selectBudget(scanner, tracker);
                     if (currentBudget != null) {
-                        budgetMenu(scanner, currentBudget);
+                        budgetMenu(scanner, currentBudget, tracker);
                     }
                 }
                 case 0 -> {
@@ -43,42 +41,35 @@ public class Main {
         }
     }
 
-    // ============================
-    // MENU BUDŻETU
-    // ============================
-
-    private static void budgetMenu(Scanner scanner, Budget budget) {
-
+    private static void budgetMenu(Scanner scanner, Budget budget, ExpenseTracker tracker) {
         while (true) {
             System.out.println("\n=== BUDŻET: " + budget.getCategory() +
                     " | saldo: " + budget.getBalance() + " ===");
 
             System.out.println("""
                     1. Dodaj wydatek
-                    2. Usuń wydatek
-                    3. Edytuj wydatek
-                    4. Historia wydatków
-                    5. Historia filtrowana
+                    2. Dodaj przychód
+                    3. Usuń transakcję
+                    4. Edytuj transakcję
+                    5. Historia transakcji
+                    6. Historia filtrowana
                     0. Powrót
                     """);
 
             int option = readInt(scanner, "Wybierz opcję: ");
 
             switch (option) {
-                case 1 -> addExpense(scanner, budget);
-                case 2 -> removeExpense(scanner, budget);
-                case 3 -> editExpense(scanner, budget);
-                case 4 -> showHistory(budget.getTransactionHistory());
-                case 5 -> showFilteredHistory(scanner, budget.getTransactionHistory());
+                case 1 -> addExpense(scanner, budget, tracker);
+                case 2 -> addIncome(scanner, budget, tracker);
+                case 3 -> removeExpense(scanner, budget, tracker);
+                case 4 -> editExpense(scanner, budget);
+                case 5 -> showHistory(budget.getTransactionHistory());
+                case 6 -> showFilteredHistory(scanner, budget.getTransactionHistory());
                 case 0 -> { return; }
                 default -> System.out.println("Nieprawidłowa opcja.");
             }
         }
     }
-
-    // ============================
-    // OBSŁUGA BUDŻETÓW
-    // ============================
 
     private static void addBudget(Scanner scanner, ExpenseTracker tracker) {
         System.out.print("Nazwa budżetu: ");
@@ -137,50 +128,47 @@ public class Main {
         return null;
     }
 
-    // ============================
-    // OPERACJE NA TRANSAKCJACH
-    // ============================
-
-    private static void addExpense(Scanner scanner, Budget budget) {
+    private static void addExpense(Scanner scanner, Budget budget, ExpenseTracker tracker) {
         double amount = readDouble(scanner);
+        String category = budget.getCategory();
 
-        System.out.print("Kategoria: ");
-        String category = scanner.nextLine();
-
-        System.out.print("Opis: ");
+        System.out.print("Opis wydatku: ");
         String description = scanner.nextLine();
 
-        budget.addTransaction(
-                new Expense(
-                        amount,
-                        category,
-                        LocalDate.now(),
-                        description
-                )
-        );
-        System.out.println("Wydatek dodany.");
+        tracker.processTransaction(new Expense(amount, category, LocalDate.now(), description));
+        System.out.println("Wydatek dodany do kategorii: " + category);
     }
 
-    private static void removeExpense(Scanner scanner, Budget budget) {
+    private static void addIncome(Scanner scanner, Budget budget, ExpenseTracker tracker) {
+        double amount = readDouble(scanner);
+        String category = budget.getCategory();
 
+        System.out.print("Opis przychodu: ");
+        String description = scanner.nextLine();
+
+        tracker.processTransaction(new Income(amount, category, LocalDate.now(), description));
+        System.out.println("Przychód dodany do kategorii: " + category);
+    }
+
+    private static void removeExpense(Scanner scanner, Budget budget, ExpenseTracker tracker) {
         TransactionHistory history = budget.getTransactionHistory();
         showHistory(history);
 
-        int index = readInt(scanner, "Numer wydatku do usunięcia: ") - 1;
+        int index = readInt(scanner, "Numer transakcji do usunięcia: ") - 1;
 
         List<Transaction> transactions = history.getHistory();
 
         if (index >= 0 && index < transactions.size()) {
             Transaction t = transactions.get(index);
             budget.removeTransaction(t);
-            System.out.println("Usunięto.");
+            tracker.getGlobalHistory().removeTransaction(t);
+            System.out.println("Usunięto transakcję.");
         } else {
             System.out.println("Nieprawidłowy numer.");
         }
     }
 
     private static void editExpense(Scanner scanner, Budget budget) {
-
         TransactionHistory history = budget.getTransactionHistory();
         List<Transaction> transactions = history.getHistory();
 
@@ -202,38 +190,29 @@ public class Main {
 
         System.out.println("Pozostaw puste, aby nie zmieniać.");
 
-        // amount
         System.out.print("Nowa kwota (" + Math.abs(t.getAmount()) + "): ");
         String amountInput = scanner.nextLine();
         double newAmount = amountInput.isBlank()
                 ? Math.abs(t.getAmount())
                 : Double.parseDouble(amountInput);
 
-        // category
-        System.out.print("Nowa kategoria (" + t.getCategory() + "): ");
-        String newCategory = scanner.nextLine();
-        if (newCategory.isBlank()) newCategory = t.getCategory();
-
-        // description
         System.out.print("Nowy opis (" + t.getDescription() + "): ");
         String newDescription = scanner.nextLine();
         if (newDescription.isBlank()) newDescription = t.getDescription();
 
-        // date
         System.out.print("Nowa data (" + t.getDate() + "): ");
         String dateInput = scanner.nextLine();
         LocalDate newDate = dateInput.isBlank()
                 ? t.getDate()
                 : LocalDate.parse(dateInput);
 
-        boolean ok = budget.editTransaction(t, newAmount, newCategory, newDate, newDescription);
+        boolean ok = budget.editTransaction(t, newAmount, budget.getCategory(), newDate, newDescription);
 
         if (ok) System.out.println("Zaktualizowano.");
         else System.out.println("Błąd edycji.");
     }
 
     private static void showHistory(TransactionHistory history) {
-
         List<Transaction> transactions = history.getHistory();
 
         if (transactions.isEmpty()) {
@@ -243,10 +222,12 @@ public class Main {
 
         for (int i = 0; i < transactions.size(); i++) {
             Transaction t = transactions.get(i);
+            String type = t instanceof Income ? "PRZYCHÓD" : "WYDATEK ";
 
             System.out.printf(
-                    "%d. %.2f | %s | %s | %s%n",
+                    "%d. [%s] %.2f | %s | %s | %s%n",
                     i + 1,
+                    type,
                     Math.abs(t.getAmount()),
                     t.getCategory(),
                     t.getDate(),
@@ -256,7 +237,6 @@ public class Main {
     }
 
     private static void showFilteredHistory(Scanner scanner, TransactionHistory history) {
-
         System.out.print("Kategoria (ENTER = brak): ");
         String category = scanner.nextLine();
         if (category.isBlank()) category = null;
@@ -271,19 +251,18 @@ public class Main {
             return;
         }
 
-        result.forEach(t ->
-                System.out.printf(
-                        "%.2f | %s | %s | %s%n",
-                        Math.abs(t.getAmount()),
-                        t.getCategory(),
-                        t.getDate(),
-                        t.getDescription()
-                ));
+        result.forEach(t -> {
+            String type = t instanceof Income ? "PRZYCHÓD" : "WYDATEK ";
+            System.out.printf(
+                    "[%s] %.2f | %s | %s | %s%n",
+                    type,
+                    Math.abs(t.getAmount()),
+                    t.getCategory(),
+                    t.getDate(),
+                    t.getDescription()
+            );
+        });
     }
-
-    // ============================
-    // POMOCNICZE
-    // ============================
 
     private static int readInt(Scanner scanner, String label) {
         while (true) {
