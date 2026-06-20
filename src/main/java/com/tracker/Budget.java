@@ -1,5 +1,7 @@
 package com.tracker;
 
+import java.time.LocalDate;
+
 public class Budget {
     private final String category;
     private double balance;
@@ -11,9 +13,9 @@ public class Budget {
         this.transactionHistory = new TransactionHistory();
     }
 
-    public double getBalance() {
-        return this.balance;
-    }
+    public double getBalance() {return this.balance;}
+    public String getCategory() {return this.category;}
+    public double getResources() {return this.balance;}
 
     public void addTransaction(Transaction transaction) {
         if (transaction != null) {
@@ -21,12 +23,19 @@ public class Budget {
             this.transactionHistory.addTransaction(transaction);
         }
     }
+    public boolean editTransaction(Transaction transaction, double newAmount, String newCategory, LocalDate newDate, String newDescription) {
+        if (!transactionHistory.getTransactions().contains(transaction)) return false;
+        double oldAmount = transaction.getAmount();
 
-    public String getCategory() {
-        return this.category;
+        transaction.setAmount(newAmount);
+        transaction.setCategory(newCategory);
+        transaction.setDate(newDate);
+        transaction.setDescription(newDescription);
+
+        double updatedAmount = transaction.getAmount();
+        this.balance -= oldAmount;
+        this.balance += updatedAmount;
+        return true;
     }
 
-    public double getResources() {
-        return this.balance;
-    }
 }
