@@ -1,4 +1,5 @@
 package com.tracker;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,5 +21,13 @@ public class TransactionHistory
     public List<Transaction> getTransactions()
     {
         return new ArrayList<>(transactions);
+    }
+    public List<Transaction> getTransactions(String category, LocalDate startDate, LocalDate endDate)
+    {
+        return transactions.stream().filter(t -> category == null ||
+                        t.getCategory().equalsIgnoreCase(category)).filter(t -> startDate == null ||
+                        !t.getDate().isBefore(startDate)).filter(t -> endDate == null ||
+                        !t.getDate().isAfter(endDate))
+                .toList();
     }
 }
