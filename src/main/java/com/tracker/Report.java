@@ -26,4 +26,8 @@ public class Report
     {
         return history.getTransactions().stream().filter(t -> t instanceof Expense).mapToDouble(Transaction::getAmount).max().orElse(0.0);
     }
+    public double minExpense(TransactionHistory history)
+    {
+        return history.getTransactions().stream().filter(t -> t instanceof Expense).mapToDouble(Transaction::getAmount).min().orElse(0.0);
+    }
 }

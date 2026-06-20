@@ -54,4 +54,9 @@ class ReportTest
     {
         assertEquals(300, report.maxExpense(history));
     }
+    @Test
+    void shouldFindMinExpense()
+    {
+        assertEquals(100, report.minExpense(history));
+    }
 }
