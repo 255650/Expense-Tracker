@@ -10,4 +10,8 @@ public class Report
     {
         return history.getTransactions().stream().filter(t -> t instanceof Expense).mapToDouble(Transaction::getAmount).sum();
     }
+    public double balance(TransactionHistory history)
+    {
+        return totalIncome(history) - totalExpenses(history);
+    }
 }

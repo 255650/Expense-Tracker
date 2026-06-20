@@ -34,4 +34,9 @@ class ReportTest
     {
         assertEquals(600, report.totalExpenses(history));
     }
+    @Test
+    void shouldCalculateBalance()
+    {
+        assertEquals(1400, report.balance(history));
+    }
 }
