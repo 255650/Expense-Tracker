@@ -1,5 +1,7 @@
 package com.tracker;
 
+import java.time.LocalDate;
+
 public class Budget {
     private final String category;
     private double balance;
@@ -28,6 +30,17 @@ public class Budget {
     public boolean editTransaction(Transaction transaction, double newAmount, String newCategory, LocalDate newDate, String newDescription) {
         if (!transactionHistory.getTransactions().contains(transaction)) return false;
         double oldAmount = transaction.getAmount();
+
+        transaction.setAmount(newAmount);
+        transaction.setCategory(newCategory);
+        transaction.setDate(newDate);
+        transaction.setDescription(newDescription);
+
+        double updatedAmount = transaction.getAmount();
+        this.balance -= oldAmount;
+        this.balance += updatedAmount;
+        return true;
+    }
 
     public String getCategory() {
         return this.category;

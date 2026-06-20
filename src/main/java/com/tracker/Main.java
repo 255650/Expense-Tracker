@@ -9,28 +9,31 @@ public class Main {
 
     public static void main(String[] args) {
 
-        TransactionHistory history = new TransactionHistory();
+        ExpenseTracker tracker = new ExpenseTracker();
+        Budget currentBudget = null;
         Scanner scanner = new Scanner(System.in);
 
         while (true) {
 
             System.out.println("""
-                    \n1. Dodaj wydatek
-                    2. Usuń wydatek
-                    3. Edytuj wydatek
-                    4. Historia wydatków
-                    5. Historia filtrowana
+                    \n=== MENU BUDŻETÓW ===
+                    1. Dodaj budżet
+                    2. Usuń budżet
+                    3. Wybierz budżet
                     0. Wyjście
                     """);
 
             int option = readInt(scanner, "Wybierz opcję: ");
 
             switch (option) {
-                case 1 -> addExpense(scanner, history);
-                case 2 -> removeExpense(scanner, history);
-                case 3 -> editExpense(scanner, history);
-                case 4 -> showHistory(history);
-                case 5 -> showFilteredHistory(scanner, history);
+                case 1 -> addBudget(scanner, tracker);
+                case 2 -> removeBudget(scanner, tracker);
+                case 3 -> {
+                    currentBudget = selectBudget(scanner, tracker);
+                    if (currentBudget != null) {
+                        budgetMenu(scanner, currentBudget);
+                    }
+                }
                 case 0 -> {
                     System.out.println("Do widzenia!");
                     return;
@@ -40,55 +43,105 @@ public class Main {
         }
     }
 
+    // ============================
+    // MENU BUDŻETU
+    // ============================
 
-    private static int readInt(Scanner scanner, String label) {
+    private static void budgetMenu(Scanner scanner, Budget budget) {
+
         while (true) {
-            System.out.print(label);
-            String input = scanner.nextLine();
+            System.out.println("\n=== BUDŻET: " + budget.getCategory() +
+                    " | saldo: " + budget.getBalance() + " ===");
 
-            try {
-                return Integer.parseInt(input);
-            } catch (NumberFormatException e) {
-                System.out.println("Podaj poprawną liczbę.");
+            System.out.println("""
+                    1. Dodaj wydatek
+                    2. Usuń wydatek
+                    3. Edytuj wydatek
+                    4. Historia wydatków
+                    5. Historia filtrowana
+                    0. Powrót
+                    """);
+
+            int option = readInt(scanner, "Wybierz opcję: ");
+
+            switch (option) {
+                case 1 -> addExpense(scanner, budget);
+                case 2 -> removeExpense(scanner, budget);
+                case 3 -> editExpense(scanner, budget);
+                case 4 -> showHistory(budget.getTransactionHistory());
+                case 5 -> showFilteredHistory(scanner, budget.getTransactionHistory());
+                case 0 -> { return; }
+                default -> System.out.println("Nieprawidłowa opcja.");
             }
         }
     }
 
-    private static double readDouble(Scanner scanner) {
-        while (true) {
-            System.out.print("Kwota: ");
-            String input = scanner.nextLine();
+    // ============================
+    // OBSŁUGA BUDŻETÓW
+    // ============================
 
-            if (input.isBlank()) {
-                System.out.println("Wartość nie może być pusta.");
-                continue;
-            }
+    private static void addBudget(Scanner scanner, ExpenseTracker tracker) {
+        System.out.print("Nazwa budżetu: ");
+        String name = scanner.nextLine();
 
-            try {
-                return Double.parseDouble(input);
-            } catch (NumberFormatException e) {
-                System.out.println("Podaj poprawną liczbę.");
-            }
+        System.out.print("Początkowy balans: ");
+        double balance = readDouble(scanner);
+
+        tracker.addBudget(new Budget(name, balance));
+        System.out.println("Dodano budżet.");
+    }
+
+    private static void removeBudget(Scanner scanner, ExpenseTracker tracker) {
+        List<Budget> budgets = tracker.getBudgets();
+
+        if (budgets.isEmpty()) {
+            System.out.println("Brak budżetów.");
+            return;
+        }
+
+        for (int i = 0; i < budgets.size(); i++) {
+            Budget b = budgets.get(i);
+            System.out.printf("%d. %s | saldo: %.2f%n", i + 1, b.getCategory(), b.getBalance());
+        }
+
+        int index = readInt(scanner, "Numer budżetu do usunięcia: ") - 1;
+
+        if (index >= 0 && index < budgets.size()) {
+            tracker.removeBudget(budgets.get(index));
+            System.out.println("Usunięto.");
+        } else {
+            System.out.println("Nieprawidłowy numer.");
         }
     }
 
-    private static LocalDate readDate(Scanner scanner, String label) {
-        System.out.print(label);
-        String input = scanner.nextLine();
+    private static Budget selectBudget(Scanner scanner, ExpenseTracker tracker) {
+        List<Budget> budgets = tracker.getBudgets();
 
-        if (input.isBlank()) return null;
-
-        try {
-            return LocalDate.parse(input);
-        } catch (DateTimeParseException e) {
-            System.out.println("Błędna data — pomijam filtr.");
+        if (budgets.isEmpty()) {
+            System.out.println("Brak budżetów.");
             return null;
         }
+
+        for (int i = 0; i < budgets.size(); i++) {
+            Budget b = budgets.get(i);
+            System.out.printf("%d. %s | saldo: %.2f%n", i + 1, b.getCategory(), b.getBalance());
+        }
+
+        int index = readInt(scanner, "Wybierz budżet: ") - 1;
+
+        if (index >= 0 && index < budgets.size()) {
+            return budgets.get(index);
+        }
+
+        System.out.println("Nieprawidłowy numer.");
+        return null;
     }
 
+    // ============================
+    // OPERACJE NA TRANSAKCJACH
+    // ============================
 
-    private static void addExpense(Scanner scanner, TransactionHistory history) {
-
+    private static void addExpense(Scanner scanner, Budget budget) {
         double amount = readDouble(scanner);
 
         System.out.print("Kategoria: ");
@@ -97,7 +150,7 @@ public class Main {
         System.out.print("Opis: ");
         String description = scanner.nextLine();
 
-        history.addTransaction(
+        budget.addTransaction(
                 new Expense(
                         amount,
                         category,
@@ -105,12 +158,12 @@ public class Main {
                         description
                 )
         );
-
         System.out.println("Wydatek dodany.");
     }
 
-    private static void removeExpense(Scanner scanner, TransactionHistory history) {
+    private static void removeExpense(Scanner scanner, Budget budget) {
 
+        TransactionHistory history = budget.getTransactionHistory();
         showHistory(history);
 
         int index = readInt(scanner, "Numer wydatku do usunięcia: ") - 1;
@@ -118,15 +171,65 @@ public class Main {
         List<Transaction> transactions = history.getHistory();
 
         if (index >= 0 && index < transactions.size()) {
-            history.removeTransaction(transactions.get(index));
+            Transaction t = transactions.get(index);
+            budget.removeTransaction(t);
             System.out.println("Usunięto.");
         } else {
             System.out.println("Nieprawidłowy numer.");
         }
     }
 
-    private static void editExpense(Scanner scanner, TransactionHistory history) {
-        System.out.println("Funkcja edycji jeszcze nie została zaimplementowana.");
+    private static void editExpense(Scanner scanner, Budget budget) {
+
+        TransactionHistory history = budget.getTransactionHistory();
+        List<Transaction> transactions = history.getHistory();
+
+        if (transactions.isEmpty()) {
+            System.out.println("Brak transakcji do edycji.");
+            return;
+        }
+
+        showHistory(history);
+
+        int index = readInt(scanner, "Numer transakcji do edycji: ") - 1;
+
+        if (index < 0 || index >= transactions.size()) {
+            System.out.println("Nieprawidłowy numer.");
+            return;
+        }
+
+        Transaction t = transactions.get(index);
+
+        System.out.println("Pozostaw puste, aby nie zmieniać.");
+
+        // amount
+        System.out.print("Nowa kwota (" + Math.abs(t.getAmount()) + "): ");
+        String amountInput = scanner.nextLine();
+        double newAmount = amountInput.isBlank()
+                ? Math.abs(t.getAmount())
+                : Double.parseDouble(amountInput);
+
+        // category
+        System.out.print("Nowa kategoria (" + t.getCategory() + "): ");
+        String newCategory = scanner.nextLine();
+        if (newCategory.isBlank()) newCategory = t.getCategory();
+
+        // description
+        System.out.print("Nowy opis (" + t.getDescription() + "): ");
+        String newDescription = scanner.nextLine();
+        if (newDescription.isBlank()) newDescription = t.getDescription();
+
+        // date
+        System.out.print("Nowa data (" + t.getDate() + "): ");
+        String dateInput = scanner.nextLine();
+        LocalDate newDate = dateInput.isBlank()
+                ? t.getDate()
+                : LocalDate.parse(dateInput);
+
+        boolean ok = budget.editTransaction(t, newAmount, newCategory, newDate, newDescription);
+
+        if (ok) System.out.println("Zaktualizowano.");
+        else System.out.println("Błąd edycji.");
     }
 
     private static void showHistory(TransactionHistory history) {
@@ -176,5 +279,54 @@ public class Main {
                         t.getDate(),
                         t.getDescription()
                 ));
+    }
+
+    // ============================
+    // POMOCNICZE
+    // ============================
+
+    private static int readInt(Scanner scanner, String label) {
+        while (true) {
+            System.out.print(label);
+            String input = scanner.nextLine();
+
+            try {
+                return Integer.parseInt(input);
+            } catch (NumberFormatException e) {
+                System.out.println("Podaj poprawną liczbę.");
+            }
+        }
+    }
+
+    private static double readDouble(Scanner scanner) {
+        while (true) {
+            System.out.print("Kwota: ");
+            String input = scanner.nextLine();
+
+            if (input.isBlank()) {
+                System.out.println("Wartość nie może być pusta.");
+                continue;
+            }
+
+            try {
+                return Double.parseDouble(input);
+            } catch (NumberFormatException e) {
+                System.out.println("Podaj poprawną liczbę.");
+            }
+        }
+    }
+
+    private static LocalDate readDate(Scanner scanner, String label) {
+        System.out.print(label);
+        String input = scanner.nextLine();
+
+        if (input.isBlank()) return null;
+
+        try {
+            return LocalDate.parse(input);
+        } catch (DateTimeParseException e) {
+            System.out.println("Błędna data — pomijam filtr.");
+            return null;
+        }
     }
 }

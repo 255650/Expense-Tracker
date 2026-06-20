@@ -17,6 +17,11 @@ public class ExpenseTracker {
             this.budgets.add(budget);
         }
     }
+    public void removeBudget(Budget budget) {
+        if (budget != null) {
+            this.budgets.remove(budget);
+        }
+    }
 
     public void processTransaction(Transaction transaction) {
         if (transaction == null) {
