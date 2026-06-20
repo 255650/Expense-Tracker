@@ -44,4 +44,9 @@ class ReportTest
     {
         assertEquals(300, report.expensesByCategory(history, "Food"));
     }
+    @Test
+    void shouldDetectBudgetExceeded()
+    {
+        assertTrue(report.isBudgetExceeded(history, budget));
+    }
 }
