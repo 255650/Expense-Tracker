@@ -20,6 +20,10 @@ public class Budget {
             this.balance += transaction.getAmount();
             this.transactionHistory.addTransaction(transaction);
         }
+    }public void removeTransaction(Transaction transaction) {
+        if (transaction == null) return;
+        this.balance -= transaction.getAmount();
+        this.transactionHistory.removeTransaction(transaction);
     }
 
     public String getCategory() {
@@ -29,4 +33,6 @@ public class Budget {
     public double getResources() {
         return this.balance;
     }
+
+    public TransactionHistory getTransactionHistory(){return transactionHistory;}
 }
