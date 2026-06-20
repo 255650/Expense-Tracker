@@ -39,4 +39,9 @@ class ReportTest
     {
         assertEquals(1400, report.balance(history));
     }
+    @Test
+    void shouldCalculateExpensesByCategory()
+    {
+        assertEquals(300, report.expensesByCategory(history, "Food"));
+    }
 }

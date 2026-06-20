@@ -14,4 +14,8 @@ public class Report
     {
         return totalIncome(history) - totalExpenses(history);
     }
+    public double expensesByCategory(TransactionHistory history, String category)
+    {
+        return history.getTransactions().stream().filter(t -> t instanceof Expense).filter(t -> t.getCategory().equalsIgnoreCase(category)).mapToDouble(Transaction::getAmount).sum();
+    }
 }
