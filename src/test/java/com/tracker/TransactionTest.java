@@ -23,6 +23,13 @@ class TransactionTest {
     }
 
     /// Testowanie poprawności argumnetów
+    @Test
+    void shouldThrowExceptionWhenCategoryIsNull() {
+        assertThrows(IllegalArgumentException.class, () ->
+                new Transaction(20, null, LocalDate.now(), "No category")
+        );
+    }
+    @Test
     void shouldThrowExceptionWhenDateIsNull() {
         assertThrows(IllegalArgumentException.class, () ->
                 new Transaction(20, "Food", null, "No date")

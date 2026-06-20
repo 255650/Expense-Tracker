@@ -2,17 +2,23 @@ package com.tracker;
 
 public class Budget {
     private final String category;
-    private final double limit;
-    private double currentExpenses = 0.0;
+    private double balance;
+    private final TransactionHistory transactionHistory;
 
-    public Budget(String category, double limit) {
+    public Budget(String category, double balance) {
         this.category = category;
-        this.limit = limit;
+        this.balance = balance;
+        this.transactionHistory = new TransactionHistory();
+    }
+
+    public double getBalance() {
+        return this.balance;
     }
 
     public void addTransaction(Transaction transaction) {
-        if (transaction.getCategory().equalsIgnoreCase(this.category)) {
-            this.currentExpenses += transaction.getAmount();
+        if (transaction != null) {
+            this.balance += transaction.getAmount();
+            this.transactionHistory.addTransaction(transaction);
         }
     }
 
@@ -20,7 +26,7 @@ public class Budget {
         return this.category;
     }
 
-    public double getLimit() {
-        return this.limit;
+    public double getResources() {
+        return this.balance;
     }
 }

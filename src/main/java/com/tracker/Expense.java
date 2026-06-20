@@ -6,6 +6,6 @@ public class Expense extends Transaction {
                    String category,
                    LocalDate date,
                    String description) {
-        super(amount, category, date, description);
+        super(-amount, category, date, description);
     }
 }

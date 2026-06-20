@@ -14,7 +14,7 @@ class ExpenseTest {
                 "Lunch"
         );
 
-        assertEquals(100.0, expense.getAmount());
+        assertEquals(-100.0, expense.getAmount());
         assertEquals("Food", expense.getCategory());
         assertEquals(LocalDate.of(2024, 1, 1), expense.getDate());
         assertEquals("Lunch", expense.getDescription());
