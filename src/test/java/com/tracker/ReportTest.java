@@ -29,4 +29,9 @@ class ReportTest
     {
         assertEquals(2000, report.totalIncome(history));
     }
+    @Test
+    void shouldCalculateTotalExpenses()
+    {
+        assertEquals(600, report.totalExpenses(history));
+    }
 }
