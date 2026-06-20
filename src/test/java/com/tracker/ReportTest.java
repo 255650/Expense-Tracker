@@ -64,4 +64,10 @@ class ReportTest
     {
         assertEquals(200, report.avgExpense(history));
     }
+    @Test
+    void shouldCalculateExpensesInPeriod()
+    {
+        double result = report.expensesInPeriod(history, LocalDate.of(2026, 6, 5), LocalDate.of(2026, 6, 30));
+        assertEquals(500, result);
+    }
 }

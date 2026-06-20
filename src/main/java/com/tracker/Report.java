@@ -1,5 +1,7 @@
 package com.tracker;
 
+import java.time.LocalDate;
+
 public class Report
 {
     public double totalIncome(TransactionHistory history)
@@ -33,5 +35,14 @@ public class Report
     public double avgExpense(TransactionHistory history)
     {
         return history.getTransactions().stream().filter(t -> t instanceof Expense).mapToDouble(Transaction::getAmount).average().orElse(0.0);
+    }
+    public double expensesInPeriod(TransactionHistory history, LocalDate start, LocalDate end)
+    {
+        return history.getTransactions().stream()
+                .filter(t -> t instanceof Expense)
+                .filter(t -> !t.getDate().isBefore(start))
+                .filter(t -> !t.getDate().isAfter(end))
+                .mapToDouble(Transaction::getAmount)
+                .sum();
     }
 }
