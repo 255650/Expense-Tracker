@@ -30,4 +30,8 @@ public class Report
     {
         return history.getTransactions().stream().filter(t -> t instanceof Expense).mapToDouble(Transaction::getAmount).min().orElse(0.0);
     }
+    public double avgExpense(TransactionHistory history)
+    {
+        return history.getTransactions().stream().filter(t -> t instanceof Expense).mapToDouble(Transaction::getAmount).average().orElse(0.0);
+    }
 }

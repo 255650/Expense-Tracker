@@ -59,4 +59,9 @@ class ReportTest
     {
         assertEquals(100, report.minExpense(history));
     }
+    @Test
+    void shouldCalculateAverageExpense()
+    {
+        assertEquals(200, report.avgExpense(history));
+    }
 }
